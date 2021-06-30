@@ -4,13 +4,15 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+
 public class MainManager : MonoBehaviour
-{
+{   
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text BestScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -18,7 +20,10 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
+    private int m_BestScore;
+    private string m_BestName;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +41,7 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+        UpdateBestScore();
     }
 
     private void Update()
@@ -66,11 +72,24 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+        UpdateBestScore();
     }
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        UpdateBestScore();
+        NameManager.Instance.SaveName();
+    }
+
+    void UpdateBestScore()
+    {
+        if (m_Points > NameManager.Instance.BestScore)
+        {
+            NameManager.Instance.BestScore = m_Points;
+            NameManager.Instance.BestName = NameManager.Instance.PlayerName;
+        }
+        BestScoreText.text = $"Best Score : {NameManager.Instance.BestName} : {NameManager.Instance.BestScore}";
     }
 }
